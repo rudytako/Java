@@ -1,6 +1,7 @@
 package com.maciek.movielibrary;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +19,12 @@ public class MovieController {
 
     @GetMapping("/{id}")
     public Movie getById(@PathVariable("id") int id) {
-        return movieRepository.getById(id);
+        try {
+            return movieRepository.getById(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @PostMapping("")
@@ -28,24 +34,36 @@ public class MovieController {
 
     @PutMapping("/{id}")
     public int update(@PathVariable("id") int id, @RequestBody Movie updatedMovie) {
-        Movie movie = movieRepository.getById(id);
+        try {
+            Movie movie = movieRepository.getById(id);
 
-        if (movie == null) return 0;
+            if (movie == null) return 0;
 
-        movie.setName(updatedMovie.getName());
-        movie.setRating(updatedMovie.getRating());
+            movie.setName(updatedMovie.getName());
+            movie.setRating(updatedMovie.getRating());
 
-        return movieRepository.update((movie));
+            return movieRepository.update(movie);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 
     @PatchMapping("/{id}")
     public int partiallyUpdate(@PathVariable("id") int id, @RequestBody Movie updatedMovie) {
-        Movie movie = movieRepository.getById(id);
-        if (movie == null) return 0;
-        if (updatedMovie.getName() != null) movie.setName(updatedMovie.getName());
-        if (updatedMovie.getRating() > 0) movie.setRating(updatedMovie.getRating());
+        try {
+            Movie movie = movieRepository.getById(id);
 
-        return movieRepository.update(movie);
+            if (movie == null) return 0;
+
+            if (updatedMovie.getName() != null) movie.setName(updatedMovie.getName());
+            if (updatedMovie.getRating() > 0) movie.setRating(updatedMovie.getRating());
+
+            return movieRepository.update(movie);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 
     @DeleteMapping("/{id}")
