@@ -1,6 +1,5 @@
 package com.maciek.movielibrary;
 
-import com.maciek.movielibrary.Movie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +11,6 @@ public class MovieController {
 
     @Autowired
     MovieRepository movieRepository;
-
     @GetMapping("")
     public List<Movie> getAll() {
         return movieRepository.getAll();
@@ -32,36 +30,27 @@ public class MovieController {
     public int update(@PathVariable("id") int id, @RequestBody Movie updatedMovie) {
         Movie movie = movieRepository.getById(id);
 
-        if (movie != null) {
-            movie.setName(updatedMovie.getName());
-            movie.setRating(updatedMovie.getRating());
+        if (movie == null) return 0;
 
-            movieRepository.update(movie);
+        movie.setName(updatedMovie.getName());
+        movie.setRating(updatedMovie.getRating());
 
-            return 1;
-        } else {
-            return -1;
-        }
+        return movieRepository.update((movie));
     }
 
     @PatchMapping("/{id}")
     public int partiallyUpdate(@PathVariable("id") int id, @RequestBody Movie updatedMovie) {
         Movie movie = movieRepository.getById(id);
+        if (movie == null) return 0;
+        if (updatedMovie.getName() != null) movie.setName(updatedMovie.getName());
+        if (updatedMovie.getRating() > 0) movie.setRating(updatedMovie.getRating());
 
-        if (movie != null) {
-            if (updatedMovie.getName() != null) movie.setName(updatedMovie.getName());
-            if (updatedMovie.getRating() > 0) movie.setRating(updatedMovie.getRating());
-
-            movieRepository.update(movie);
-
-            return 1;
-        } else {
-            return -1;
-        }
+        return movieRepository.update(movie);
     }
 
     @DeleteMapping("/{id}")
     public int delete(@PathVariable("id") int id) {
         return movieRepository.delete(id);
     }
+
 }
